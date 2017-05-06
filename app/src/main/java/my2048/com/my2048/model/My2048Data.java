@@ -1,6 +1,6 @@
-package androidclass.com.my2048.model;
+package my2048.com.my2048.model;
 
-import androidclass.com.my2048.utility.TimeUtil;
+import my2048.com.my2048.utility.TimeUtil;
 
 import java.sql.Time;
 import java.util.Timer;
