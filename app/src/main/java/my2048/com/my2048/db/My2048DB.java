@@ -32,18 +32,18 @@ public class My2048DB {
         return my2048DB;
     }
 
-    public void insertData(My2048Data My2048Data) {
-        if (My2048Data != null) {
+    public void insertData(My2048Data my2048Data) {
+        if (my2048Data != null) {
             ContentValues values = new ContentValues();
-            values.put("score", My2048Data.getScore());
-            values.put("step", My2048Data.getStep());
-            values.put("id", My2048Data.getId());
-            values.put("time", My2048Data.getTime().toString());
+            values.put("score", my2048Data.getScore());
+            values.put("step", my2048Data.getStep());
+            values.put("id", my2048Data.getId());
+            values.put("time", my2048Data.getTime().toString());
             StringBuilder stringBuilder = new StringBuilder();
-            int[] numbers = My2048Data.getNumbers();
+            int[] numbers = my2048Data.getNumbers();
             stringBuilder.append(numbers[0]);
             for (int i = 0; i < 16; ++i) {
-                stringBuilder.append(","+My2048Data.getNumbers()[i]);
+                stringBuilder.append(","+my2048Data.getNumbers()[i]);
             }
             values.put("numbers", stringBuilder.toString());
             db.insert("Data", null, values);
@@ -60,19 +60,19 @@ public class My2048DB {
                 new String[] {Integer.toString(lowerId), Integer.toString(upperId)}, null, null, "score desc");
         if (cursor.moveToFirst()) {
             do {
-                My2048Data My2048Data = new My2048Data();
-                My2048Data.setId(cursor.getInt(cursor.getColumnIndex("id")));
-                My2048Data.setScore(cursor.getInt(cursor.getColumnIndex("score")));
-                My2048Data.setStep(cursor.getInt(cursor.getColumnIndex("step")));
-                My2048Data.setTime(new TimeUtil(cursor.getString(cursor.getColumnIndex("time"))));
+                My2048Data my2048Data = new My2048Data();
+                my2048Data.setId(cursor.getInt(cursor.getColumnIndex("id")));
+                my2048Data.setScore(cursor.getInt(cursor.getColumnIndex("score")));
+                my2048Data.setStep(cursor.getInt(cursor.getColumnIndex("step")));
+                my2048Data.setTime(new TimeUtil(cursor.getString(cursor.getColumnIndex("time"))));
                 String numbers = cursor.getString(cursor.getColumnIndex("numbers"));
                 String[] tem = numbers.split(",");
                 int[] intTem = new int[16];
                 for (int i = 0; i < 16; ++i) {
                     intTem[i] = Integer.valueOf(tem[i]);
                 }
-                My2048Data.setNumbers(intTem);
-                list.add(My2048Data);
+                my2048Data.setNumbers(intTem);
+                list.add(my2048Data);
             } while (cursor.moveToNext());
         }
         if (cursor != null) {
@@ -81,16 +81,16 @@ public class My2048DB {
         return list;
     }
 
-    public void updateData(int id, My2048Data My2048Data) {
+    public void updateData(int id, My2048Data my2048Data) {
         ContentValues values = new ContentValues();
-        values.put("score", My2048Data.getScore());
-        values.put("step", My2048Data.getStep());
-        values.put("time", My2048Data.getTime().toString());
+        values.put("score", my2048Data.getScore());
+        values.put("step", my2048Data.getStep());
+        values.put("time", my2048Data.getTime().toString());
         StringBuilder stringBuilder = new StringBuilder();
-        int[] numbers = My2048Data.getNumbers();
+        int[] numbers = my2048Data.getNumbers();
         stringBuilder.append(numbers[0]);
         for (int i = 1; i < 16; ++i) {
-            stringBuilder.append(","+My2048Data.getNumbers()[i]);
+            stringBuilder.append(","+my2048Data.getNumbers()[i]);
         }
         values.put("numbers", stringBuilder.toString());
         db.update("Data", values, "id = ?", new String[] {String.valueOf(id)});
