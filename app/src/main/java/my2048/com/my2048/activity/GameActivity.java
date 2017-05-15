@@ -4,12 +4,14 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.ActionBar;
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.Image;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -597,6 +599,26 @@ public class GameActivity extends Activity implements View.OnClickListener {
         editor.putInt("max_score", maxScore);
         editor.putBoolean("can_resume", false);
         editor.commit();
+        // upload score to server
+        // show dialog
+        LinearLayout submit = (LinearLayout) getLayoutInflater().inflate(R.layout.submit, null);
+        new AlertDialog.Builder(this)
+                .setTitle("你想上传你的分数吗？")
+                .setView(submit)
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // upload score to server
+                    }
+                })
+                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // NOTHING
+                    }
+                })
+                .create()
+                .show();
     }
     // change the original image blocks into new ones
     private void setNewPiece(int position, int number) {
