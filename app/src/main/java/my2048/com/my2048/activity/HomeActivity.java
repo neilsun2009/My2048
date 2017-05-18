@@ -23,13 +23,17 @@ public class HomeActivity extends Activity implements View.OnClickListener {
     private boolean showResume;
     private boolean showClock;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_home);
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         showResume = sharedPreferences.getBoolean("can_resume", false);
+
+        //forType =new Bundle();
 
         mainPlayButton = (Button)findViewById(R.id.main_play_button);
         mainResumeButton = (Button)findViewById(R.id.main_resume_button);
@@ -42,25 +46,30 @@ public class HomeActivity extends Activity implements View.OnClickListener {
             mainResumeButton.setOnClickListener(this);
         }
         mainRankButton.setOnClickListener(this);
-        if (showClock) {
-            mainClockButton.setOnClickListener(this);
-        }
+        //if (showClock) {
+        mainClockButton.setOnClickListener(this);
+       // }
     }
 
     private void initButtons() {
         if (!showResume) {
             mainResumeButton.setAlpha((float) 0.5);
         }
-        showClock = false;
-        mainClockButton.setAlpha((float) 0.5);
+       // showClock = false;
+       // mainClockButton.setAlpha((float) 0.5);
     }
 
     @Override
     public void onClick(View view) {
+        Bundle forType = new Bundle();
+        int t;
         view.setAlpha((float) 0.8);
         switch (view.getId()) {
             case R.id.main_resume_button :
+                t=1;
+                forType.putInt("type",t);
                 Intent intent = new Intent(this, GameActivity.class);
+                intent.putExtras(forType);
                 startActivity(intent);
                 break;
             case R.id.main_play_button :
@@ -68,10 +77,19 @@ public class HomeActivity extends Activity implements View.OnClickListener {
                 editor.putBoolean("can_resume", false);
                 editor.commit();
 
-                intent = new Intent(this, GameActivity.class);
-                startActivity(intent);
+                t=1;
+                forType.putInt("type",t);
+                Intent intent1 = new Intent(this, GameActivity.class);
+                intent1.putExtras(forType);
+                startActivity(intent1);
                 break;
-            case R.id.main_clock_button : break;
+            case R.id.main_clock_button :
+                t=0;
+                forType.putInt("type",t);
+                Intent intent0 = new Intent(this, GameActivity.class);
+                intent0.putExtras(forType);
+                startActivity(intent0);
+                break;
             case R.id.main_rank_button : break;
             default : break;
         }
@@ -90,5 +108,6 @@ public class HomeActivity extends Activity implements View.OnClickListener {
         }
         mainPlayButton.setAlpha(1.0f);
         mainRankButton.setAlpha(1.0f);
+        mainClockButton.setAlpha(1.0f);
     }
 }
