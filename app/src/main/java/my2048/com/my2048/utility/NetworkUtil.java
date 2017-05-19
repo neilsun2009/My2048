@@ -9,8 +9,10 @@ import android.widget.Toast;
 
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -35,8 +37,10 @@ public class NetworkUtil {
                     Toast.makeText(context, "上传失败", Toast.LENGTH_SHORT).show();
                     break;
                 case GET_SUCCEED:
+                    // Toast.makeText(context, "排行榜数据为" + msg.obj, Toast.LENGTH_SHORT).show();
                     break;
                 case GET_FAIL:
+                    Toast.makeText(context, "获取排行榜数据失败", Toast.LENGTH_SHORT).show();
                     break;
                 default:
                     break;
@@ -101,6 +105,56 @@ public class NetworkUtil {
                         LogUtil.d("network", "fail " + e.toString());
                         Message message = new Message();
                         message.what = SUBMIT_FAIL;
+                        handler.sendMessage(message);
+                    } finally {
+                        if (connection != null) {
+                            connection.disconnect();
+                        }
+                    }
+
+                }
+            }).start();
+        }
+
+    }
+
+    static public void getRequest(final int mode, final Context mContext) {
+        context = mContext;
+        if (checkInternet()) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    HttpURLConnection connection = null;
+                    try {
+                        URL url = new URL(SERVER + "?mode=" + mode);
+                        connection = (HttpURLConnection) url.openConnection();
+                        connection.setRequestMethod("GET");
+                        connection.setConnectTimeout(8000);
+                        connection.setReadTimeout(8000);
+                        // DataOutputStream out = new DataOutputStream(connection.getOutputStream());
+                        // out.writeBytes(json.toString());
+                        InputStream in = connection.getInputStream();
+                        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                        StringBuilder response = new StringBuilder();
+                        String line;
+                        while ((line = reader.readLine()) != null) {
+                            response.append(line);
+                        }
+                        LogUtil.d("network", "success " + response.toString());
+                        connection.connect();
+                        if (connection.getResponseCode() != 200) {
+                            throw new RuntimeException("Failed : HTTP error code : "
+                                    + connection.getResponseCode());
+                        }
+                        Message message = new Message();
+                        message.what = GET_SUCCEED;
+                        message.obj = response.toString();
+                        handler.sendMessage(message);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        LogUtil.d("network", "fail " + e.toString());
+                        Message message = new Message();
+                        message.what = GET_FAIL;
                         handler.sendMessage(message);
                     } finally {
                         if (connection != null) {

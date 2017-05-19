@@ -704,6 +704,7 @@ public class GameActivity extends Activity implements View.OnClickListener {
                 } else {
                     // upload score to server
                     NetworkUtil.postRequest(gameType, my2048Data.getScore(), username, getLayoutInflater().getContext());
+                    NetworkUtil.getRequest(gameType, getLayoutInflater().getContext());
                     alertDialog.cancel();
                 }
             }
