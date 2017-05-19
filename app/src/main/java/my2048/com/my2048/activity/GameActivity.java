@@ -26,10 +26,12 @@ import android.view.animation.ScaleAnimation;
 import android.view.animation.TranslateAnimation;
 import android.widget.AbsoluteLayout;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -43,6 +45,7 @@ import my2048.com.my2048.db.My2048DB;
 import my2048.com.my2048.model.My2048Data;
 import my2048.com.my2048.utility.Hash;
 import my2048.com.my2048.utility.LogUtil;
+import my2048.com.my2048.utility.NetworkUtil;
 import my2048.com.my2048.utility.TimeUtil;
 
 import org.w3c.dom.Text;
@@ -61,6 +64,7 @@ public class GameActivity extends Activity implements View.OnClickListener {
     TextView scoreHighestTxt;
     TextView scoreTimeTxt;
     TextView scoreStepTxt;
+    EditText submitName;
     Button btnPause;
     // Button btnMenu;
     ImageView[] oriImage = new ImageView[16];
@@ -94,9 +98,9 @@ public class GameActivity extends Activity implements View.OnClickListener {
     //animation
     final int animTime = 100;
 
-    //1 for normal mode, 0 for countdown mode
-    final int MODE_NORMAL = 1;
-    final int MODE_COUNTDOWN = 0;
+    //0 for normal mode, 1 for countdown mode
+    final int MODE_NORMAL = 0;
+    final int MODE_COUNTDOWN = 1;
     int gameType = MODE_NORMAL;
 
     // TimeUtil backTimer;
@@ -109,8 +113,8 @@ public class GameActivity extends Activity implements View.OnClickListener {
         my2048DB = My2048DB.getInstance(this);
 
 
-            Bundle type =this.getIntent().getExtras();
-            gameType = type.getInt("type");
+        Bundle type =this.getIntent().getExtras();
+        gameType = type.getInt("type");
 
 
 
@@ -652,26 +656,7 @@ public class GameActivity extends Activity implements View.OnClickListener {
             editor.putInt("max_score", maxScore);
             editor.putBoolean("can_resume", false);
             editor.commit();
-            // upload score to server
-            // show dialog
-            LinearLayout submit = (LinearLayout) getLayoutInflater().inflate(R.layout.submit, null);
-            new AlertDialog.Builder(this)
-                    .setTitle("你想上传你的分数吗？")
-                    .setView(submit)
-                    .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            // upload score to server
-                        }
-                    })
-                    .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            // NOTHING
-                        }
-                    })
-                    .create()
-                    .show();
+
         } else { // COUNTDOWN MODE
             btnStart.setText("TIME UP");
             List<My2048Data> list = my2048DB.queryData(11,20);
@@ -689,27 +674,40 @@ public class GameActivity extends Activity implements View.OnClickListener {
             editor.putInt("max_score_countdown", maxScore);
             // editor.putBoolean("can_resume", false);
             editor.commit();
-            // upload score to server
-            // show dialog
-            LinearLayout submit = (LinearLayout) getLayoutInflater().inflate(R.layout.submit, null);
-            new AlertDialog.Builder(this)
-                    .setTitle("你想上传你的分数吗？")
-                    .setView(submit)
-                    .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            // upload score to server
-                        }
-                    })
-                    .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            // NOTHING
-                        }
-                    })
-                    .create()
-                    .show();
+
         }
+        // show dialog
+        LinearLayout submit = (LinearLayout) getLayoutInflater().inflate(R.layout.submit, null);
+        AlertDialog.Builder builder = new AlertDialog.Builder(GameActivity.this);
+
+        builder.setTitle("你想上传你的分数吗？");
+        builder.setView(submit);
+        builder.setCancelable(false);
+        builder.setPositiveButton("确定", null);
+        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // NOTHING
+            }
+        });
+        final AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+        submitName = (EditText) alertDialog.findViewById(R.id.submit_name);
+        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // upload score to server
+                String username = submitName.getText().toString();
+                LogUtil.d("submit", username);
+                if (username.trim().equals("")) {
+                    Toast.makeText(getLayoutInflater().getContext(), "用户名不能为空", Toast.LENGTH_SHORT).show();
+                } else {
+                    // upload score to server
+                    NetworkUtil.postRequest(gameType, my2048Data.getScore(), username, getLayoutInflater().getContext());
+                    alertDialog.cancel();
+                }
+            }
+        });
 
     }
     // change the original image blocks into new ones

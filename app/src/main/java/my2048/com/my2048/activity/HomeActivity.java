@@ -23,8 +23,8 @@ public class HomeActivity extends Activity implements View.OnClickListener {
     private boolean showResume;
     private boolean showClock;
 
-    final int MODE_NORMAL = 1;
-    final int MODE_COUNTDOWN = 0;
+    final int MODE_NORMAL = 0;
+    final int MODE_COUNTDOWN = 1;
 
 
     @Override

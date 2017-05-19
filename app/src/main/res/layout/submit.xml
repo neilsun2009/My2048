@@ -9,6 +9,7 @@
         android:text="名字："
         android:textSize="20sp"/>
     <EditText
+        android:id="@+id/submit_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"/>
