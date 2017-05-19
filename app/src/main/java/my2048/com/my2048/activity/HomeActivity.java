@@ -23,6 +23,9 @@ public class HomeActivity extends Activity implements View.OnClickListener {
     private boolean showResume;
     private boolean showClock;
 
+    final int MODE_NORMAL = 1;
+    final int MODE_COUNTDOWN = 0;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,12 +65,11 @@ public class HomeActivity extends Activity implements View.OnClickListener {
     @Override
     public void onClick(View view) {
         Bundle forType = new Bundle();
-        int t;
         view.setAlpha((float) 0.8);
         switch (view.getId()) {
             case R.id.main_resume_button :
-                t=1;
-                forType.putInt("type",t);
+
+                forType.putInt("type", MODE_NORMAL);
                 Intent intent = new Intent(this, GameActivity.class);
                 intent.putExtras(forType);
                 startActivity(intent);
@@ -77,15 +79,14 @@ public class HomeActivity extends Activity implements View.OnClickListener {
                 editor.putBoolean("can_resume", false);
                 editor.commit();
 
-                t=1;
-                forType.putInt("type",t);
+                forType.putInt("type", MODE_NORMAL);
                 Intent intent1 = new Intent(this, GameActivity.class);
                 intent1.putExtras(forType);
                 startActivity(intent1);
                 break;
             case R.id.main_clock_button :
-                t=0;
-                forType.putInt("type",t);
+
+                forType.putInt("type", MODE_COUNTDOWN);
                 Intent intent0 = new Intent(this, GameActivity.class);
                 intent0.putExtras(forType);
                 startActivity(intent0);
@@ -105,6 +106,7 @@ public class HomeActivity extends Activity implements View.OnClickListener {
             mainResumeButton.setOnClickListener(this);
         } else {
             mainResumeButton.setAlpha(0.5f);
+            mainResumeButton.setOnClickListener(null);
         }
         mainPlayButton.setAlpha(1.0f);
         mainRankButton.setAlpha(1.0f);

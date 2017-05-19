@@ -62,7 +62,7 @@ public class GameActivity extends Activity implements View.OnClickListener {
     TextView scoreTimeTxt;
     TextView scoreStepTxt;
     Button btnPause;
-    Button btnMenu;
+    // Button btnMenu;
     ImageView[] oriImage = new ImageView[16];
 
     // ImageView oriImage01;
@@ -94,9 +94,12 @@ public class GameActivity extends Activity implements View.OnClickListener {
     //animation
     final int animTime = 100;
 
-    int GameType=1; //1 for normal, 0 for time mode
+    //1 for normal mode, 0 for countdown mode
+    final int MODE_NORMAL = 1;
+    final int MODE_COUNTDOWN = 0;
+    int gameType = MODE_NORMAL;
 
-    TimeUtil backTimer;
+    // TimeUtil backTimer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,7 +110,7 @@ public class GameActivity extends Activity implements View.OnClickListener {
 
 
             Bundle type =this.getIntent().getExtras();
-            GameType = type.getInt("type");
+            gameType = type.getInt("type");
 
 
 
@@ -119,7 +122,7 @@ public class GameActivity extends Activity implements View.OnClickListener {
         scoreStepTxt = (TextView)findViewById(R.id.score_step_txt);
         scoreTimeTxt = (TextView)findViewById(R.id.score_time_txt);
         btnPause = (Button) findViewById(R.id.game_btn_pause);
-        btnMenu = (Button) findViewById(R.id.game_btn_menu);
+        // btnMenu = (Button) findViewById(R.id.game_btn_menu);
         for (int i = 0; i < 16; ++i) {
             oriImage[i] = (ImageView)findViewById(Hash.ORI_IMAGE_RESOURCE[i]);
         }
@@ -128,8 +131,13 @@ public class GameActivity extends Activity implements View.OnClickListener {
         btnStart = (Button)findViewById(R.id.btn_start);
         btnStart.setText("START");
         btnStart.setOnClickListener(this);
-        btnPause.setOnClickListener(this);
-        btnMenu.setOnClickListener(this);
+        // only normal mode shows pause button
+        if (gameType == MODE_COUNTDOWN) {
+            btnPause.setVisibility(View.GONE);
+        } else {
+            btnPause.setOnClickListener(this);
+        }
+        // btnMenu.setOnClickListener(this);
         hoverLayout = (RelativeLayout)findViewById(R.id.hover_layout);
 
         // main area slide events
@@ -178,37 +186,38 @@ public class GameActivity extends Activity implements View.OnClickListener {
     }
 
     private void saveDataForPause() {
-        if (maxScore == 0) {
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-            maxScore = sharedPreferences.getInt("max_score", 0);
-            if (my2048Data != null) {
-                if (maxScore < my2048Data.getScore()) {
-                    maxScore = my2048Data.getScore();
+            if (maxScore == 0) {
+                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+                maxScore = sharedPreferences.getInt("max_score", 0);
+                if (my2048Data != null) {
+                    if (maxScore < my2048Data.getScore()) {
+                        maxScore = my2048Data.getScore();
+                    }
                 }
             }
-        }
-        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
-        if(GameType==1)
-        editor.putBoolean("can_resume", true);
-        editor.putInt("max_score", maxScore);
-        LogUtil.d("Init-pause", Integer.toString(maxScore));
-        editor.commit();
-        if (my2048Data == null) return;
-        List<My2048Data> list = my2048DB.queryData(0, 0);
-        if (list.isEmpty()) {
-            my2048DB.insertData(my2048Data);
-        } else {
-            my2048DB.updateData(0, my2048Data);
-            LogUtil.d("StartNew", "Update");
-        }
-        isPause = true;
+            SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
+            editor.putBoolean("can_resume", true);
+            editor.putInt("max_score", maxScore);
+            LogUtil.d("Init-pause", Integer.toString(maxScore));
+            editor.commit();
+            if (my2048Data == null) return;
+            List<My2048Data> list = my2048DB.queryData(0, 0);
+            if (list.isEmpty()) {
+                my2048DB.insertData(my2048Data);
+            } else {
+                my2048DB.updateData(0, my2048Data);
+                LogUtil.d("StartNew", "Update");
+            }
+            isPause = true;
+
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        if(GameType==1)
-        saveDataForPause();
+        if (gameType == MODE_NORMAL) {
+            saveDataForPause();
+        }
     }
 
     @Override
@@ -446,7 +455,7 @@ public class GameActivity extends Activity implements View.OnClickListener {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_start :
-                backTimer =new TimeUtil(0,10);
+                // backTimer =new TimeUtil(0,10);
                 Hash.imageLocation = new int[16][2];
                 for (int i = 0; i < 16; ++i) {
                     oriImage[i].getLocationOnScreen(Hash.imageLocation[i]);
@@ -464,14 +473,14 @@ public class GameActivity extends Activity implements View.OnClickListener {
                     @Override
                     public void handleMessage(Message msg) {
                         if (msg.what == 0x666) {
-                            if(GameType==1){
+                            if (gameType == MODE_NORMAL) {
                                 my2048Data.tickTime(1);
                                 scoreTimeTxt.setText(my2048Data.getTime().toString());
-                            } else if(GameType==0) {
-                                my2048Data.setTime(backTimer);
-                                my2048Data.tickTime(0);
+                            } else if(gameType == MODE_COUNTDOWN) {
+                                // my2048Data.setTime(backTimer);
+                                my2048Data.tickTime(-1);
                                 scoreTimeTxt.setText(my2048Data.getTime().toString());
-                                if(backTimer.isNil()) {
+                                if(my2048Data.getTime().isNil()) {
                                     gameOver();
                                 }
                             }
@@ -482,20 +491,20 @@ public class GameActivity extends Activity implements View.OnClickListener {
                 startTimer();
                 break;
             case R.id.game_btn_pause :
-                if(GameType==1)
+                // if (GameType==1)
                 saveDataForPause();
                 hoverLayout.setVisibility(View.VISIBLE);
                 stopTimer();
                 btnPause.setBackgroundResource(R.drawable.game_resume);
                 break;
-            case R.id.game_btn_menu :
-                if(GameType==1)
-                saveDataForPause();
-                // Intent intent = new Intent(GameActivity.this, HomeActivity.class);
-                // startActivity(intent);
-                finish();
-               // onStop();
-                break;
+//            case R.id.game_btn_menu :
+//                // if(GameType==1)
+//                saveDataForPause();
+//                // Intent intent = new Intent(GameActivity.this, HomeActivity.class);
+//                // startActivity(intent);
+//                finish();
+//               // onStop();
+//                break;
             default:
                 break;
 
@@ -543,22 +552,26 @@ public class GameActivity extends Activity implements View.OnClickListener {
     private void initMainArea() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         maxScore = sharedPreferences.getInt("max_score", 0);
-        LogUtil.d("Init", Integer.toString(maxScore));
+        // LogUtil.d("Init", Integer.toString(maxScore));
         // scoreHighestTxt.setText(Integer.toString(maxScore));
         // id = sharedPreferences.getInt("id", 0);
         canResume = sharedPreferences.getBoolean("can_resume", false);
         // isCountdown = sharedPreferences.getBoolean("is_countdown", false);
 
-        if (canResume&&GameType==1) {
+        if (canResume && gameType == MODE_NORMAL) {
             List<My2048Data> list = my2048DB.queryData(0,0);
             my2048Data = list.get(0);
             LogUtil.d("StartNew",  Integer.toString(list.size()));
         } else {
             my2048Data = new My2048Data();
-            SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
-            if(GameType==1)
-            editor.putBoolean("can_resume", true);
-            editor.commit();
+            if (gameType == MODE_COUNTDOWN) {
+                my2048Data.setTime(new TimeUtil(3, 0));
+                maxScore = sharedPreferences.getInt("max_score_countdown", 0);
+            } else if (gameType == MODE_NORMAL) {
+                SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
+                editor.putBoolean("can_resume", true);
+                editor.commit();
+            }
             LogUtil.d("StartNew", "Yes");
         }
         if (my2048Data.getScore() > maxScore) {
@@ -579,7 +592,11 @@ public class GameActivity extends Activity implements View.OnClickListener {
             }
             // oriImage[i].setImageResource(Hash.BLOCK_RESOURCE[Hash.blockHash(my2048Data.getNumbers()[i])]);
         }
-        setRandomNewPiece();
+        // only when starting a new game, set a new piece
+        if (my2048Data.getScore() == 0) {
+            setRandomNewPiece();
+        }
+
     }
 
     // generate new image view on canvas
@@ -617,44 +634,83 @@ public class GameActivity extends Activity implements View.OnClickListener {
 
 
         hoverLayout.setVisibility(View.VISIBLE);
-        btnStart.setText("DEAD!");
         stopTimer();
-        List<My2048Data> list = my2048DB.queryData(1,10);
-        if (list.size() < 10) {
-            my2048Data.setId(list.size()+1);
-            my2048DB.insertData(my2048Data);
-        } else {
-            My2048Data tem = list.get(9);
-            if (my2048Data.getScore() > tem.getScore()) {
-                my2048Data.setId(tem.getId());
-                my2048DB.updateData(tem.getId(), my2048Data);
+        if (gameType == MODE_NORMAL) {
+            btnStart.setText("DEAD!");
+            List<My2048Data> list = my2048DB.queryData(1,10);
+            if (list.size() < 10) {
+                my2048Data.setId(list.size()+1);
+                my2048DB.insertData(my2048Data);
+            } else {
+                My2048Data tem = list.get(9);
+                if (my2048Data.getScore() > tem.getScore()) {
+                    my2048Data.setId(tem.getId());
+                    my2048DB.updateData(tem.getId(), my2048Data);
+                }
             }
+            SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
+            editor.putInt("max_score", maxScore);
+            editor.putBoolean("can_resume", false);
+            editor.commit();
+            // upload score to server
+            // show dialog
+            LinearLayout submit = (LinearLayout) getLayoutInflater().inflate(R.layout.submit, null);
+            new AlertDialog.Builder(this)
+                    .setTitle("你想上传你的分数吗？")
+                    .setView(submit)
+                    .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // upload score to server
+                        }
+                    })
+                    .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // NOTHING
+                        }
+                    })
+                    .create()
+                    .show();
+        } else { // COUNTDOWN MODE
+            btnStart.setText("TIME UP");
+            List<My2048Data> list = my2048DB.queryData(11,20);
+            if (list.size() < 10) {
+                my2048Data.setId(list.size()+11);
+                my2048DB.insertData(my2048Data);
+            } else {
+                My2048Data tem = list.get(9);
+                if (my2048Data.getScore() > tem.getScore()) {
+                    my2048Data.setId(tem.getId());
+                    my2048DB.updateData(tem.getId(), my2048Data);
+                }
+            }
+            SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
+            editor.putInt("max_score_countdown", maxScore);
+            // editor.putBoolean("can_resume", false);
+            editor.commit();
+            // upload score to server
+            // show dialog
+            LinearLayout submit = (LinearLayout) getLayoutInflater().inflate(R.layout.submit, null);
+            new AlertDialog.Builder(this)
+                    .setTitle("你想上传你的分数吗？")
+                    .setView(submit)
+                    .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // upload score to server
+                        }
+                    })
+                    .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // NOTHING
+                        }
+                    })
+                    .create()
+                    .show();
         }
 
-        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
-        editor.putInt("max_score", maxScore);
-        editor.putBoolean("can_resume", false);
-        editor.commit();
-        // upload score to server
-        // show dialog
-        LinearLayout submit = (LinearLayout) getLayoutInflater().inflate(R.layout.submit, null);
-        new AlertDialog.Builder(this)
-                .setTitle("你想上传你的分数吗？")
-                .setView(submit)
-                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // upload score to server
-                    }
-                })
-                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // NOTHING
-                    }
-                })
-                .create()
-                .show();
     }
     // change the original image blocks into new ones
     private void setNewPiece(int position, int number) {

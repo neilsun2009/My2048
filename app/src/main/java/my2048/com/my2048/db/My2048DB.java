@@ -52,7 +52,7 @@ public class My2048DB {
 
     //usage:
     //normal mode:1-10, countdown mode:11-20
-    //0 for current
+    //0 for current (only in normal mode)
     public List<My2048Data> queryData(int lowerId, int upperId) {
         // db.delete("data", null, null);
         List<My2048Data> list = new ArrayList<My2048Data>();
