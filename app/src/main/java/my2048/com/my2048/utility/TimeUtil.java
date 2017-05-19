@@ -34,7 +34,7 @@ public class TimeUtil {
         --second;
         if (second == -1) {
             --minute;
-            second = 59;
+            second = 0;
             if (minute == -1) {
                 return false;
             }
@@ -45,12 +45,4 @@ public class TimeUtil {
         String sec = String.format("%2d", second).replace(" ", "0");
         return minute + ":" + sec;
     }
-    public  boolean isNil() {
-        if (minute<= 0) {
-            if(second <=0)
-                return true;
-        }
-        return false;
-    }
-
 }
