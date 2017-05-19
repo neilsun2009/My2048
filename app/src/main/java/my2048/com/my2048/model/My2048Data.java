@@ -50,8 +50,11 @@ public class My2048Data {
         this.time = time;
     }
 
-    public void tickTime() {
-        time.tickForward();
+    public void tickTime(int f) {
+        if(f==1)
+            time.tickForward();
+        else if(f==0)
+            time.tickBackward();
     }
 
     public int getStep() {

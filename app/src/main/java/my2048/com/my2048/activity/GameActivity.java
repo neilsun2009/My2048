@@ -43,12 +43,15 @@ import my2048.com.my2048.db.My2048DB;
 import my2048.com.my2048.model.My2048Data;
 import my2048.com.my2048.utility.Hash;
 import my2048.com.my2048.utility.LogUtil;
+import my2048.com.my2048.utility.TimeUtil;
 
 import org.w3c.dom.Text;
+
 
 public class GameActivity extends Activity implements View.OnClickListener {
 
     //timer
+
     Timer mTimer;
     TimerTask mTimerTask;
     Handler timerHandler;
@@ -91,12 +94,22 @@ public class GameActivity extends Activity implements View.OnClickListener {
     //animation
     final int animTime = 100;
 
+    int GameType=1; //1 for normal, 0 for time mode
+
+    TimeUtil backTimer;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_game);
         my2048DB = My2048DB.getInstance(this);
+
+
+            Bundle type =this.getIntent().getExtras();
+            GameType = type.getInt("type");
+
+
 
         // main area
         canvas = (RelativeLayout)findViewById(R.id.canvas);
@@ -175,6 +188,7 @@ public class GameActivity extends Activity implements View.OnClickListener {
             }
         }
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
+        if(GameType==1)
         editor.putBoolean("can_resume", true);
         editor.putInt("max_score", maxScore);
         LogUtil.d("Init-pause", Integer.toString(maxScore));
@@ -193,6 +207,7 @@ public class GameActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onPause() {
         super.onPause();
+        if(GameType==1)
         saveDataForPause();
     }
 
@@ -205,6 +220,13 @@ public class GameActivity extends Activity implements View.OnClickListener {
         /*SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         maxScore = sharedPreferences.getInt("max_score", 0);
         scoreHighestTxt.setText(Integer.toString(maxScore));*/
+    }
+
+    @Override
+    protected  void onStop() {
+        super.onStop();
+        stopTimer();
+
     }
 
     private void moveBlock(int direction) {
@@ -424,6 +446,7 @@ public class GameActivity extends Activity implements View.OnClickListener {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_start :
+                backTimer =new TimeUtil(0,10);
                 Hash.imageLocation = new int[16][2];
                 for (int i = 0; i < 16; ++i) {
                     oriImage[i].getLocationOnScreen(Hash.imageLocation[i]);
@@ -435,16 +458,23 @@ public class GameActivity extends Activity implements View.OnClickListener {
 
                 initMainArea();
                 btnPause.setBackgroundResource(R.drawable.game_pause);
-
-
                 hoverLayout.setVisibility(View.INVISIBLE);
                 // handler for timer
                 timerHandler = new Handler(){
                     @Override
                     public void handleMessage(Message msg) {
                         if (msg.what == 0x666) {
-                            my2048Data.tickTime();
-                            scoreTimeTxt.setText(my2048Data.getTime().toString());
+                            if(GameType==1){
+                                my2048Data.tickTime(1);
+                                scoreTimeTxt.setText(my2048Data.getTime().toString());
+                            } else if(GameType==0) {
+                                my2048Data.setTime(backTimer);
+                                my2048Data.tickTime(0);
+                                scoreTimeTxt.setText(my2048Data.getTime().toString());
+                                if(backTimer.isNil()) {
+                                    gameOver();
+                                }
+                            }
                         }
                     }
                 };
@@ -452,16 +482,19 @@ public class GameActivity extends Activity implements View.OnClickListener {
                 startTimer();
                 break;
             case R.id.game_btn_pause :
+                if(GameType==1)
                 saveDataForPause();
                 hoverLayout.setVisibility(View.VISIBLE);
                 stopTimer();
                 btnPause.setBackgroundResource(R.drawable.game_resume);
                 break;
             case R.id.game_btn_menu :
+                if(GameType==1)
                 saveDataForPause();
                 // Intent intent = new Intent(GameActivity.this, HomeActivity.class);
                 // startActivity(intent);
                 finish();
+               // onStop();
                 break;
             default:
                 break;
@@ -516,13 +549,14 @@ public class GameActivity extends Activity implements View.OnClickListener {
         canResume = sharedPreferences.getBoolean("can_resume", false);
         // isCountdown = sharedPreferences.getBoolean("is_countdown", false);
 
-        if (canResume) {
+        if (canResume&&GameType==1) {
             List<My2048Data> list = my2048DB.queryData(0,0);
             my2048Data = list.get(0);
             LogUtil.d("StartNew",  Integer.toString(list.size()));
         } else {
             my2048Data = new My2048Data();
             SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
+            if(GameType==1)
             editor.putBoolean("can_resume", true);
             editor.commit();
             LogUtil.d("StartNew", "Yes");
@@ -579,6 +613,8 @@ public class GameActivity extends Activity implements View.OnClickListener {
 
     }
     private void gameOver() {
+
+
 
         hoverLayout.setVisibility(View.VISIBLE);
         btnStart.setText("DEAD!");
