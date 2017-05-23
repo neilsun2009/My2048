@@ -91,7 +91,11 @@ public class HomeActivity extends Activity implements View.OnClickListener {
                 intent0.putExtras(forType);
                 startActivity(intent0);
                 break;
-            case R.id.main_rank_button : break;
+            case R.id.main_rank_button :
+                Intent intent2 = new Intent(this, LocalRankActivity.class);
+                intent2.putExtras(forType);
+                startActivity(intent2);
+                break;
             default : break;
         }
     }

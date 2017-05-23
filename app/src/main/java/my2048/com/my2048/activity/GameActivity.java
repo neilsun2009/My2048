@@ -569,7 +569,7 @@ public class GameActivity extends Activity implements View.OnClickListener {
         } else {
             my2048Data = new My2048Data();
             if (gameType == MODE_COUNTDOWN) {
-                my2048Data.setTime(new TimeUtil(3, 0));
+                my2048Data.setTime(new TimeUtil(0, 10));
                 maxScore = sharedPreferences.getInt("max_score_countdown", 0);
             } else if (gameType == MODE_NORMAL) {
                 SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
@@ -704,7 +704,7 @@ public class GameActivity extends Activity implements View.OnClickListener {
                 } else {
                     // upload score to server
                     NetworkUtil.postRequest(gameType, my2048Data.getScore(), username, getLayoutInflater().getContext());
-                    NetworkUtil.getRequest(gameType, getLayoutInflater().getContext());
+                    // NetworkUtil.getRequest(gameType, getLayoutInflater().getContext());
                     alertDialog.cancel();
                 }
             }

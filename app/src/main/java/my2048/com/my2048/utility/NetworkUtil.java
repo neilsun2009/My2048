@@ -5,8 +5,12 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
+import android.util.Log;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -16,6 +20,17 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+
+import my2048.com.my2048.R;
+import my2048.com.my2048.activity.NetRankActivity;
+import my2048.com.my2048.model.My2048Data;
 
 /**
  * Created by Administrator on 2017/5/19.
@@ -37,7 +52,28 @@ public class NetworkUtil {
                     Toast.makeText(context, "上传失败", Toast.LENGTH_SHORT).show();
                     break;
                 case GET_SUCCEED:
-                    // Toast.makeText(context, "排行榜数据为" + msg.obj, Toast.LENGTH_SHORT).show();
+                    List<My2048Data> list = new ArrayList<My2048Data>();
+                    try {
+                        JSONObject jsonObject = new JSONObject(msg.obj.toString());
+                        JSONArray resultJsonArray = jsonObject.getJSONArray("scores");
+                        for (int i = 0; i < resultJsonArray.length(); i++) {
+                            My2048Data data = new My2048Data();
+                            data.setUsername(resultJsonArray.getJSONObject(i).getString("username"));
+                            data.setScore(resultJsonArray.getJSONObject(i).getInt("score"));
+                            list.add(data);
+                        }
+                        NetRankActivity.my2048DataList = list;
+                        NetRankActivity.dataList.clear();
+                        for (int i = 0; i < NetRankActivity.my2048DataList.size(); i++) {
+                            Map<String, Object> map = new HashMap<String, Object>();
+                            map.put("rank", i+1);
+                            map.put("name", NetRankActivity.my2048DataList.get(i).getUsername());
+                            map.put("points", NetRankActivity.my2048DataList.get(i).getScore());
+                            NetRankActivity.dataList.add(map);
+                        }
+                        NetRankActivity.adapter.notifyDataSetChanged();
+                    } catch (Exception e) {
+                    }
                     break;
                 case GET_FAIL:
                     Toast.makeText(context, "获取排行榜数据失败", Toast.LENGTH_SHORT).show();
