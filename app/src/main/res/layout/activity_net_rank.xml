@@ -7,14 +7,16 @@
     android:id="@+id/canvas"
     tools:context="my2048.com.my2048.activity.NetRankActivity"
     android:layout_gravity="center"
-    android:background="#E1F5FE"
+    android:background="#02A9F3"
     >
 
     <TextView
+        android:paddingTop="20dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="网络排行榜"
         android:textAlignment="center"
+        android:textColor="#fff"
         android:textSize="40sp"
         android:id="@+id/textView" />
 
@@ -24,13 +26,16 @@
         android:layout_height="wrap_content"
         android:text="本地排行榜"
         android:textSize="20sp"
+        android:background="#fff"
+        android:textColor="#02A9F3"
         android:layout_below="@+id/textView" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:layout_below="@+id/localRankButton">
+        android:layout_below="@+id/localRankButton"
+        android:layout_marginTop="5dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -38,25 +43,31 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/timeModelButton"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="计时模式"
-                android:textSize="20sp"
-                android:onClick="TimeModelButtonOnClick"/>
-
-            <Button
                 android:id="@+id/normalModelButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="普通模式"
+                android:textColor="#02A9F3"
+                android:background="#E1F5FE"
                 android:textSize="20sp" />
+            <Button
+                android:id="@+id/timeModelButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="计时模式"
+                android:textColor="#02A9F3"
+                android:textSize="20sp"
+                android:background="#fff"
+                android:onClick="TimeModelButtonOnClick"/>
+
+
         </LinearLayout>
         <ListView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:id="@+id/rankList">
 
         </ListView>

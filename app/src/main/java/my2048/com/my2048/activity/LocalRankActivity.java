@@ -1,6 +1,7 @@
 package my2048.com.my2048.activity;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -40,7 +41,7 @@ public class LocalRankActivity extends AppCompatActivity {
         normalModelButton = (Button) findViewById(R.id.normalModelButton);
         listView = (ListView) findViewById(R.id.rankList);
         my2048DB = My2048DB.getInstance(this);
-        my2048DataList = my2048DB.queryData(11,20);
+        my2048DataList = my2048DB.queryData(1,10);
         getData();
         netRankButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -48,6 +49,7 @@ public class LocalRankActivity extends AppCompatActivity {
                 Intent intent = new Intent();
                 intent.setClass(LocalRankActivity.this, NetRankActivity.class);
                 LocalRankActivity.this.startActivity(intent);
+                finish();
             }
         });
 
@@ -57,6 +59,8 @@ public class LocalRankActivity extends AppCompatActivity {
                 my2048DataList = my2048DB.queryData(1,10);
                 getData();
                 adapter.notifyDataSetChanged();
+                timeModelButton.setBackgroundColor(Color.parseColor("#FFFFFF"));
+                normalModelButton.setBackgroundColor(Color.parseColor("#E1F5FE"));
             }
         });
 
@@ -66,6 +70,8 @@ public class LocalRankActivity extends AppCompatActivity {
                 my2048DataList = my2048DB.queryData(11,20);
                 getData();
                 adapter.notifyDataSetChanged();
+                timeModelButton.setBackgroundColor(Color.parseColor("#e1f5fe"));
+                normalModelButton.setBackgroundColor(Color.parseColor("#FFFFFF"));
             }
         });
         adapter  = new SimpleAdapter(this,

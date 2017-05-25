@@ -6,7 +6,6 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:id="@+id/canvas"
-    tools:context="androidclass.com.my2048.activity.GameActivity"
     android:layout_gravity="center"
     android:background="#E1F5FE"
     >

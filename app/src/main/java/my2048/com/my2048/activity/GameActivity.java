@@ -138,6 +138,26 @@ public class GameActivity extends Activity implements View.OnClickListener {
         // only normal mode shows pause button
         if (gameType == MODE_COUNTDOWN) {
             btnPause.setVisibility(View.GONE);
+            // show rules alert
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+            boolean showAlert = sharedPreferences.getBoolean("countdown_alert", true);
+            if (showAlert) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(GameActivity.this);
+                builder.setTitle("计时模式注意事项");
+                builder.setMessage("你有3分钟时间获取尽量多分数！\n注意计时模式下无法暂停，且中途退出进度将不会保存！");
+                builder.setCancelable(false);
+                builder.setPositiveButton("不再提示", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
+                        editor.putBoolean("countdown_alert", false);
+                        editor.commit();
+                    }
+                });
+                builder.setNegativeButton("知道了", null);
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
+            }
         } else {
             btnPause.setOnClickListener(this);
         }
@@ -569,7 +589,7 @@ public class GameActivity extends Activity implements View.OnClickListener {
         } else {
             my2048Data = new My2048Data();
             if (gameType == MODE_COUNTDOWN) {
-                my2048Data.setTime(new TimeUtil(0, 10));
+                my2048Data.setTime(new TimeUtil(3, 0));
                 maxScore = sharedPreferences.getInt("max_score_countdown", 0);
             } else if (gameType == MODE_NORMAL) {
                 SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
@@ -625,8 +645,12 @@ public class GameActivity extends Activity implements View.OnClickListener {
         for (int i = 0; i < 16; ++i) {
             if (my2048Data.getNumbers()[i] != 0) continue;
             if (p == r) {
-                startNewPieceAnimation(i, 2);
-                // setNewPiece(i, 2);
+                int randomFour = random.nextInt(20);
+                if (randomFour == 0) {
+                    startNewPieceAnimation(i, 4);
+                } else {
+                    startNewPieceAnimation(i, 2);
+                }
                 break;
             }
             ++p;

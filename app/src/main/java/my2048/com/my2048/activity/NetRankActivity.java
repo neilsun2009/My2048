@@ -1,6 +1,7 @@
 package my2048.com.my2048.activity;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -47,6 +48,7 @@ public class NetRankActivity extends AppCompatActivity {
                 Intent intent = new Intent();
                 intent.setClass(NetRankActivity.this, LocalRankActivity.class);
                 NetRankActivity.this.startActivity(intent);
+                finish();
             }
         });
 
@@ -54,6 +56,8 @@ public class NetRankActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 NetworkUtil.getRequest(0, getLayoutInflater().getContext());
+                timeModelButton.setBackgroundColor(Color.parseColor("#FFFFFF"));
+                normalModelButton.setBackgroundColor(Color.parseColor("#E1F5FE"));
             }
         });
 
@@ -61,6 +65,8 @@ public class NetRankActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 NetworkUtil.getRequest(1, getLayoutInflater().getContext());
+                timeModelButton.setBackgroundColor(Color.parseColor("#e1f5fe"));
+                normalModelButton.setBackgroundColor(Color.parseColor("#FFFFFF"));
             }
         });
         adapter = new SimpleAdapter(this, dataList, R.layout.listtemp,
