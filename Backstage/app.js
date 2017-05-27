@@ -19,6 +19,9 @@ var counterMinScore,
       flag: 'r'
     };
 
+
+    
+
 var app = express();
 
 app.use(bodyParser());
@@ -102,7 +105,7 @@ function getScore(req, res) {
 // 提交分数
 function postScore(req, res) {
   if (req.body) {
-    console.log(req.body);
+    // console.log(req.body);
     var username = req.body.username,
         score = parseInt(req.body.score),
         mode = parseInt(req.body.mode);
