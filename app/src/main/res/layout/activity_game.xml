@@ -6,7 +6,6 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:id="@+id/canvas"
-    tools:context="androidclass.com.my2048.activity.GameActivity"
     android:layout_gravity="center"
     android:background="#E1F5FE"
     >
@@ -26,20 +25,20 @@
                 android:layout_height="wrap_content"
                 android:src="@drawable/game_title"
                 android:layout_alignParentLeft="true"/>
-            <Button
-                android:id="@+id/game_btn_menu"
-                android:layout_width="@dimen/game_btn"
-                android:layout_height="@dimen/game_btn"
-                android:background="@drawable/game_menu"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:singleLine="true" />
+            <!--<Button-->
+                <!--android:id="@+id/game_btn_menu"-->
+                <!--android:layout_width="@dimen/game_btn"-->
+                <!--android:layout_height="@dimen/game_btn"-->
+                <!--android:background="@drawable/game_menu"-->
+                <!--android:layout_alignParentRight="true"-->
+                <!--android:layout_centerVertical="true"-->
+                <!--android:singleLine="true" />-->
             <Button
                 android:id="@+id/game_btn_pause"
                 android:layout_width="@dimen/game_btn"
                 android:layout_height="@dimen/game_btn"
                 android:background="@drawable/game_pause"
-                android:layout_toLeftOf="@id/game_btn_menu"
+                android:layout_alignParentRight="true"
                 android:layout_marginRight="10dp"
                 android:layout_centerVertical="true"
                 android:singleLine="true" />

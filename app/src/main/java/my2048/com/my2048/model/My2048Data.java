@@ -13,6 +13,7 @@ public class My2048Data {
     private int[] numbers;
     private TimeUtil time;
     private int step;
+    private String username;
     private int score;
 
     public My2048Data() {
@@ -22,9 +23,11 @@ public class My2048Data {
             numbers[i] = 0;
         step = 0;
         score = 0;
+        username = "me";
         time = new TimeUtil();
     }
-
+    public String getUsername() {return username;}
+    public void setUsername(String name){username = name;}
     public int getId() {
         return id;
     }
@@ -50,8 +53,13 @@ public class My2048Data {
         this.time = time;
     }
 
-    public void tickTime() {
-        time.tickForward();
+    public void tickTime(int f) {
+        if (f == 1) {
+            time.tickForward();
+        }
+        else if(f == -1) {
+            time.tickBackward();
+        }
     }
 
     public int getStep() {
