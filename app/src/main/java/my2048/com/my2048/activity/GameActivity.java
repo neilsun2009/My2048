@@ -220,7 +220,7 @@ public class GameActivity extends Activity implements View.OnClickListener {
                 }
             }
             SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
-            editor.putBoolean("can_resume", true);
+            editor.putBoolean("can_resume", canResume);
             editor.putInt("max_score", maxScore);
             LogUtil.d("Init-pause", Integer.toString(maxScore));
             editor.commit();
@@ -321,8 +321,6 @@ public class GameActivity extends Activity implements View.OnClickListener {
                 public void handleMessage(Message msg) {
                     if (msg.what == 0x789) {
                         setRandomNewPiece();
-
-                        // checkGameOver();
                     }
                     if (msg.what == 0xabc) {
                         LogUtil.d("Over", "Ready to Check");
@@ -501,7 +499,6 @@ public class GameActivity extends Activity implements View.OnClickListener {
                                 my2048Data.tickTime(1);
                                 scoreTimeTxt.setText(my2048Data.getTime().toString());
                             } else if(gameType == MODE_COUNTDOWN) {
-                                // my2048Data.setTime(backTimer);
                                 my2048Data.tickTime(-1);
                                 scoreTimeTxt.setText(my2048Data.getTime().toString());
                                 if(my2048Data.getTime().isNil()) {
@@ -593,7 +590,8 @@ public class GameActivity extends Activity implements View.OnClickListener {
                 maxScore = sharedPreferences.getInt("max_score_countdown", 0);
             } else if (gameType == MODE_NORMAL) {
                 SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
-                editor.putBoolean("can_resume", true);
+                canResume = true;
+                editor.putBoolean("can_resume", canResume);
                 editor.commit();
             }
             LogUtil.d("StartNew", "Yes");
@@ -665,6 +663,7 @@ public class GameActivity extends Activity implements View.OnClickListener {
         stopTimer();
         if (gameType == MODE_NORMAL) {
             btnStart.setText("DEAD!");
+            canResume = false;
             List<My2048Data> list = my2048DB.queryData(1,10);
             if (list.size() < 10) {
                 my2048Data.setId(list.size()+1);
@@ -678,7 +677,8 @@ public class GameActivity extends Activity implements View.OnClickListener {
             }
             SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
             editor.putInt("max_score", maxScore);
-            editor.putBoolean("can_resume", false);
+            editor.putBoolean("can_resume", canResume);
+            LogUtil.d("gameover", "no resume");
             editor.commit();
 
         } else { // COUNTDOWN MODE

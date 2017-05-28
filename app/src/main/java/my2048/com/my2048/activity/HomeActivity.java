@@ -12,6 +12,7 @@ import android.view.Window;
 import android.widget.Button;
 
 import my2048.com.my2048.R;
+import my2048.com.my2048.utility.LogUtil;
 
 public class HomeActivity extends Activity implements View.OnClickListener {
 
@@ -105,6 +106,7 @@ public class HomeActivity extends Activity implements View.OnClickListener {
         super.onResume();
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         showResume = sharedPreferences.getBoolean("can_resume", false);
+        LogUtil.d("HomeResume", String.valueOf(showResume));
         if (showResume) {
             mainResumeButton.setAlpha(1.0f);
             mainResumeButton.setOnClickListener(this);
